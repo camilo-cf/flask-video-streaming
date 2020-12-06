@@ -3,14 +3,17 @@ from importlib import import_module
 import os
 from flask import Flask, render_template, Response
 
-# import camera driver
-if os.environ.get('CAMERA'):
-    Camera = import_module('camera_' + os.environ['CAMERA']).Camera
-else:
-    from camera import Camera
+from camera_opencv import Camera
 
-# Raspberry Pi camera module (requires picamera package)
-# from camera_pi import Camera
+start_ngrok_v = True
+
+def start_ngrok():
+    from pyngrok import ngrok
+
+    url  = ngrok.connect(5000)
+    print(" * Tunnel URL: ", url)
+
+
 
 app = Flask(__name__)
 
@@ -35,6 +38,8 @@ def video_feed():
     return Response(gen(Camera()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
+if start_ngrok_v == True:
+    start_ngrok()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', threaded=True)
